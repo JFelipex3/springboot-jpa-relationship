@@ -1,0 +1,20 @@
+version: '3.8' # Especifica la versión de Docker Compose File Format
+
+services:
+  db: # Nombre de tu servicio de base de datos
+    image: mysql:8.0 # Imagen de MySQL a usar
+    container_name: my-mysql-db # Nombre opcional para el contenedor
+    restart: always # Asegura que el contenedor se reinicie si falla o si Docker se reinicia
+    environment: # Variables de entorno para la configuración de MySQL
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD_ROOT}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "3306:3306" # Mapea el puerto 3306 del host al 3306 del contenedor
+    volumes:
+      - db_data:/var/lib/mysql # Persiste los datos de MySQL en un volumen nombrado
+      #- ./init_scripts:/docker-entrypoint-initdb.d # Opcional: Para scripts de inicialización SQL/Shell
+
+volumes:
+  db_data: # Definición del volumen nombrado
