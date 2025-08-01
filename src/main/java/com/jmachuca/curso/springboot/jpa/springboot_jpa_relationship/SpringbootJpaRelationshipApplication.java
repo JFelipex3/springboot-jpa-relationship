@@ -1,5 +1,6 @@
 package com.jmachuca.curso.springboot.jpa.springboot_jpa_relationship;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -20,6 +21,10 @@ public class SpringbootJpaRelationshipApplication implements CommandLineRunner{
 	private InvoiceRepository invoiceRepository;
 
 	public static void main(String[] args) {
+		Dotenv dotenv = Dotenv.load();
+		System.setProperty("DB_NAME", dotenv.get("DB_NAME"));
+		System.setProperty("DB_USER", dotenv.get("DB_USER"));
+		System.setProperty("DB_PASSWORD", dotenv.get("DB_PASSWORD"));
 		SpringApplication.run(SpringbootJpaRelationshipApplication.class, args);
 	}
 
