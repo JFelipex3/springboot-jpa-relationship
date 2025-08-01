@@ -53,9 +53,16 @@ public class Invoice {
         this.total = total;
     }
 
+    public Client getClient() {
+        return client;
+    }
+
+    public void setClient(Client client) {
+        this.client = client;
+    }
+
     @Override
     public String toString() {
         return "{id=" + id + ", description=" + description + ", total=" + total + ", client=" + client + "}";
     }
-
 }
