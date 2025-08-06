@@ -2,6 +2,7 @@ package com.jmachuca.curso.springboot.jpa.springboot_jpa_relationship;
 
 import io.github.cdimascio.dotenv.Dotenv;
 
+import java.util.Arrays;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,11 +36,11 @@ public class SpringbootJpaRelationshipApplication implements CommandLineRunner{
 
 	@Override
 	public void run(String... args) throws Exception {
-		oneToMany();
+		oneToManyFindByIdClient(2L);
 	}
 
 	@Transactional
-	public void oneToMany() {
+	public void oneToManyCreateClient() {
 		Client client = new Client("Fran", "Moras");
 
 		Address address1 = new Address("El vergel", 1234);
@@ -50,7 +51,28 @@ public class SpringbootJpaRelationshipApplication implements CommandLineRunner{
 
 		clientRepository.save(client);
 
-		System.out.println("Cliente guardado: " + client);
+		// Consulta y muestra dentro de la transacción
+		Client clienteGuardado = clientRepository.findById(client.getId()).orElse(client);
+		System.out.println("Cliente guardado: " + clienteGuardado);
+	}
+
+	@Transactional
+	public void oneToManyFindByIdClient(Long idCliente) {
+		Optional<Client> optionalClient = clientRepository.findById(idCliente);
+
+		optionalClient.ifPresentOrElse(client -> {
+			Address address1 = new Address("El vergel", 1234);
+			Address address2 = new Address("Vasco de Gama", 9875);
+
+			client.setAddresses(Arrays.asList(address1, address2));
+
+			clientRepository.save(client);
+
+			System.out.println("Cliente guardado: " + client);
+
+		}, () -> {
+			System.out.println("El cliente no existe");
+		});
 	}
 
 	@Transactional
