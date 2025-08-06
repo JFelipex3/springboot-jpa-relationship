@@ -52,6 +52,7 @@ public class SpringbootJpaRelationshipApplication implements CommandLineRunner{
 		clientRepository.save(client);
 
 		System.out.println("Cliente guardado: " + client);
+		client.imprimeFormat();
 
 		Optional<Client> optionalClient = clientRepository.findById(3L);
 
@@ -61,6 +62,7 @@ public class SpringbootJpaRelationshipApplication implements CommandLineRunner{
 			clientRepository.save(existingClient);
 
 			System.out.println("Cliente actualizado: " + existingClient);
+			existingClient.imprimeFormat();
 		}, () -> {
 			System.out.println("El cliente no existe");
 		});

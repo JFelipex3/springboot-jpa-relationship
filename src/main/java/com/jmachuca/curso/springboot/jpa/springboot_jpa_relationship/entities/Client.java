@@ -84,4 +84,27 @@ public class Client {
                 "}";
     }
 
+    public void imprimeFormat() {
+        System.out.println("");
+        System.out.println("========================================");
+        System.out.println("Datos del Cliente");
+        System.out.println("-----------------");
+        System.out.println("Id: " + this.id);
+        System.out.println("Cliente: " + this.name + " " + this.lastname);
+        System.out.println("");
+        System.out.println("Direcciones ");
+        System.out.println("-----------");
+        
+        if (addresses.isEmpty()) {
+            System.out.println("    No hay direcciones asociadas.");
+        } else {
+            addresses.forEach(address -> {
+                System.out.println("    Id: " + address.getId() + " - " + address.getStreet() + " " + address.getNumber());
+            });
+        }
+
+        System.out.println("========================================");
+        System.out.println("");
+    }
+
 }
