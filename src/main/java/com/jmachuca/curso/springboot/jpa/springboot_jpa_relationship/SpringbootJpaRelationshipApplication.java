@@ -36,7 +36,34 @@ public class SpringbootJpaRelationshipApplication implements CommandLineRunner{
 
 	@Override
 	public void run(String... args) throws Exception {
-		oneToManyFindByIdClient(2L);
+		removeAddress();
+	}
+
+	@Transactional
+	public void removeAddress() {
+		Client client = new Client("Fran", "Moras");
+
+		Address address1 = new Address("El vergel", 1234);
+		Address address2 = new Address("Vasco de Gama", 9875);
+
+		client.getAddresses().add(address1);
+		client.getAddresses().add(address2);
+
+		clientRepository.save(client);
+
+		System.out.println("Cliente guardado: " + client);
+
+		Optional<Client> optionalClient = clientRepository.findById(3L);
+
+		optionalClient.ifPresentOrElse(existingClient -> {
+			existingClient.getAddresses().remove(address1);
+
+			clientRepository.save(existingClient);
+
+			System.out.println("Cliente actualizado: " + existingClient);
+		}, () -> {
+			System.out.println("El cliente no existe");
+		});
 	}
 
 	@Transactional
@@ -51,9 +78,7 @@ public class SpringbootJpaRelationshipApplication implements CommandLineRunner{
 
 		clientRepository.save(client);
 
-		// Consulta y muestra dentro de la transacción
-		Client clienteGuardado = clientRepository.findById(client.getId()).orElse(client);
-		System.out.println("Cliente guardado: " + clienteGuardado);
+		System.out.println("Cliente guardado: " + client);
 	}
 
 	@Transactional
