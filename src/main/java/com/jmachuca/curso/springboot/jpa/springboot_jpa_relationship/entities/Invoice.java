@@ -65,6 +65,10 @@ public class Invoice {
 
     @Override
     public String toString() {
-        return "{id=" + id + ", description=" + description + ", total=" + total + ", client=" + client + "}";
+        return  "{id=" + id + 
+                ", description=" + description + 
+                ", total=" + total + 
+               // ", client=" + client +  // No se puede tener una referencia circular aqui, si se define acá no se debe tener en el toString de Cliente la impresión de invoices
+                "}";
     }
 }

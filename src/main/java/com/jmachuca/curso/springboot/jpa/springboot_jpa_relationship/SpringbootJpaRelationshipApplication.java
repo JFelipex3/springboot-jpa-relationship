@@ -2,7 +2,9 @@ package com.jmachuca.curso.springboot.jpa.springboot_jpa_relationship;
 
 import io.github.cdimascio.dotenv.Dotenv;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +38,30 @@ public class SpringbootJpaRelationshipApplication implements CommandLineRunner{
 
 	@Override
 	public void run(String... args) throws Exception {
-		removeAddressFindByIdClient(2L);
+		oneToManyInvoiceBidireccional();
+	}
+
+	@Transactional
+	public void oneToManyInvoiceBidireccional() {
+		Client client = new Client("Fran", "Moras");
+
+		Invoice invoice1 = new Invoice("Compras de la casa", 5000L);
+		Invoice invoice2 = new Invoice("Compras de la oficina", 8000L);
+
+		List<Invoice> invoices = new ArrayList<>();
+		invoices.add(invoice1);
+		invoices.add(invoice2);
+
+		client.setInvoices(invoices);
+
+		// Como es una relación bidireccional, debemos establecer el cliente en cada factura
+		invoice1.setClient(client);
+		invoice2.setClient(client);
+
+		clientRepository.save(client); // El cliente contiene las facturas, por lo que al guardar el cliente, también se guardan las facturas
+
+		System.out.println("Cliente guardado: " + client);
+
 	}
 
 	@Transactional
