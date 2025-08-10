@@ -122,6 +122,11 @@ public class Client {
         return true;
     }
 
+    public void removeInvoice(Invoice invoice) {
+        this.getInvoices().remove(invoice);
+        invoice.setClient(null);;
+    }
+
     public void imprimeFormat() {
         System.out.println("");
         System.out.println("========================================");

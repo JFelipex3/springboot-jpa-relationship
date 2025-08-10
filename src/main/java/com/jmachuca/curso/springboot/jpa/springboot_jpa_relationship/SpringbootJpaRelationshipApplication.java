@@ -38,7 +38,47 @@ public class SpringbootJpaRelationshipApplication implements CommandLineRunner{
 
 	@Override
 	public void run(String... args) throws Exception {
-		oneToManyInvoiceBidireccionalFindById();
+		removeInvoiceBidireccionalFindById();
+	}
+
+	@Transactional
+	public void removeInvoiceBidireccionalFindById() {
+		
+		Optional<Client> optionalClient = clientRepository.findOne(1L);
+
+		optionalClient.ifPresent( client -> {
+			Invoice invoice1 = new Invoice("Compras de la casa", 5000L);
+			Invoice invoice2 = new Invoice("Compras de la oficina", 8000L);
+
+			Set<Invoice> invoices = new HashSet<>();
+			invoices.add(invoice1);
+			invoices.add(invoice2);
+
+			client.setInvoices(invoices);
+
+			// Como es una relación bidireccional, debemos establecer el cliente en cada factura
+			invoice1.setClient(client);
+			invoice2.setClient(client);
+
+			clientRepository.save(client); // El cliente contiene las facturas, por lo que al guardar el cliente, también se guardan las facturas
+
+			System.out.println("Cliente guardado: " + client);
+		});
+
+		Optional<Client> optionalClien2 = clientRepository.findOne(1L);
+
+		optionalClien2.ifPresent(client -> {
+			Optional<Invoice> optionalInvoice = invoiceRepository.findById(2L);
+
+			optionalInvoice.ifPresent(invoice -> {
+				client.removeInvoice(invoice);
+
+				clientRepository.save(client);
+
+				System.out.println("Factura eliminada: " + invoice);
+				System.out.println("Cliente actualizado: " + client);
+			});
+		});
 	}
 
 	@Transactional
