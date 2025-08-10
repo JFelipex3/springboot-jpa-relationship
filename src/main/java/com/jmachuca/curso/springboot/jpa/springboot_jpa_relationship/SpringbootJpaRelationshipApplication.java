@@ -2,10 +2,10 @@ package com.jmachuca.curso.springboot.jpa.springboot_jpa_relationship;
 
 import io.github.cdimascio.dotenv.Dotenv;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -38,7 +38,7 @@ public class SpringbootJpaRelationshipApplication implements CommandLineRunner{
 
 	@Override
 	public void run(String... args) throws Exception {
-		oneToManyInvoiceBidireccional();
+		oneToManyInvoiceBidireccionalFindById();
 	}
 
 	@Transactional
@@ -48,7 +48,7 @@ public class SpringbootJpaRelationshipApplication implements CommandLineRunner{
 		Invoice invoice1 = new Invoice("Compras de la casa", 5000L);
 		Invoice invoice2 = new Invoice("Compras de la oficina", 8000L);
 
-		List<Invoice> invoices = new ArrayList<>();
+		Set<Invoice> invoices = new HashSet<>();
 		invoices.add(invoice1);
 		invoices.add(invoice2);
 
@@ -62,6 +62,31 @@ public class SpringbootJpaRelationshipApplication implements CommandLineRunner{
 
 		System.out.println("Cliente guardado: " + client);
 
+	}
+
+	@Transactional
+	public void oneToManyInvoiceBidireccionalFindById() {
+		
+		Optional<Client> optionalClient = clientRepository.findOne(1L);
+
+		optionalClient.ifPresent( client -> {
+			Invoice invoice1 = new Invoice("Compras de la casa", 5000L);
+			Invoice invoice2 = new Invoice("Compras de la oficina", 8000L);
+
+			Set<Invoice> invoices = new HashSet<>();
+			invoices.add(invoice1);
+			invoices.add(invoice2);
+
+			client.setInvoices(invoices);
+
+			// Como es una relación bidireccional, debemos establecer el cliente en cada factura
+			invoice1.setClient(client);
+			invoice2.setClient(client);
+
+			clientRepository.save(client); // El cliente contiene las facturas, por lo que al guardar el cliente, también se guardan las facturas
+
+			System.out.println("Cliente guardado: " + client);
+		});
 	}
 
 	@Transactional
@@ -101,17 +126,17 @@ public class SpringbootJpaRelationshipApplication implements CommandLineRunner{
 			Address address1 = new Address("El vergel", 1234);
 			Address address2 = new Address("Vasco de Gama", 9875);
 
-			client.setAddresses(Arrays.asList(address1, address2));
+			client.setAddresses(new HashSet<>(Arrays.asList(address1, address2)));
 
 			clientRepository.save(client);
 
 			System.out.println("Cliente guardado: " + client);
 			client.imprimeFormat();
 
-			Optional<Client> optionalClient2 = clientRepository.findOne(idCliente);
+			Optional<Client> optionalClient2 = clientRepository.findOneWithAddresses(idCliente);
 
 			optionalClient2.ifPresent(existingClient -> {
-				existingClient.getAddresses().remove(existingClient.getAddresses().get(1));
+				existingClient.getAddresses().remove(address2);
 
 				clientRepository.save(existingClient);
 
@@ -145,7 +170,7 @@ public class SpringbootJpaRelationshipApplication implements CommandLineRunner{
 			Address address1 = new Address("El vergel", 1234);
 			Address address2 = new Address("Vasco de Gama", 9875);
 
-			client.setAddresses(Arrays.asList(address1, address2));
+			client.setAddresses(new HashSet<>(Arrays.asList(address1, address2)));
 
 			clientRepository.save(client);
 
