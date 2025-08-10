@@ -83,7 +83,7 @@ public class SpringbootJpaRelationshipApplication implements CommandLineRunner{
 			System.out.println("Cliente guardado: " + client);
 			client.imprimeFormat();
 
-			Optional<Client> optionalClient2 = clientRepository.findById(idCliente);
+			Optional<Client> optionalClient2 = clientRepository.findOne(idCliente);
 
 			optionalClient2.ifPresent(existingClient -> {
 				existingClient.getAddresses().remove(existingClient.getAddresses().get(1));
