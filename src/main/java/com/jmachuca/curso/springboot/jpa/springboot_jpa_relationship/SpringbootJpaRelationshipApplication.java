@@ -43,21 +43,33 @@ public class SpringbootJpaRelationshipApplication implements CommandLineRunner{
 
 	@Override
 	public void run(String... args) throws Exception {
-		oneToOne();
+		oneToOneFindById();
+	}
+
+	@Transactional
+	public void oneToOneFindById() {
+		ClientDetails clientDetails = new ClientDetails(true, 5000);
+		clientDetailsRepository.save(clientDetails);
+
+		Optional<Client> clientOptional = clientRepository.findOne(2L);
+		clientOptional.ifPresent(client -> {
+			client.setClientDetails(clientDetails);
+			clientRepository.save(client);
+	
+			System.out.println(client);
+		});
 	}
 
 	@Transactional
 	public void oneToOne() {
-
+		ClientDetails clientDetails = new ClientDetails(true, 5000);
+		clientDetailsRepository.save(clientDetails);
+		
 		Client client = new Client("Erba", "Pura");
+		client.setClientDetails(clientDetails);
 		clientRepository.save(client);
 
-		ClientDetails clientDetails = new ClientDetails(true, 5000);
-		clientDetails.setClient(client);
-		clientDetailsRepository.save(clientDetails);
-
-		System.out.println("Cliente guardado: " + client);
-		System.out.println("Detalles del cliente guardados: " + clientDetails);
+		System.out.println(client);
 	}
 
 	@Transactional
@@ -161,7 +173,6 @@ public class SpringbootJpaRelationshipApplication implements CommandLineRunner{
 		clientRepository.save(client);
 
 		System.out.println("Cliente guardado: " + client);
-		client.imprimeFormat();
 
 		Optional<Client> optionalClient = clientRepository.findById(3L);
 
@@ -171,7 +182,6 @@ public class SpringbootJpaRelationshipApplication implements CommandLineRunner{
 			clientRepository.save(existingClient);
 
 			System.out.println("Cliente actualizado: " + existingClient);
-			existingClient.imprimeFormat();
 		}, () -> {
 			System.out.println("El cliente no existe");
 		});
@@ -190,7 +200,6 @@ public class SpringbootJpaRelationshipApplication implements CommandLineRunner{
 			clientRepository.save(client);
 
 			System.out.println("Cliente guardado: " + client);
-			client.imprimeFormat();
 
 			Optional<Client> optionalClient2 = clientRepository.findOneWithAddresses(idCliente);
 
@@ -200,7 +209,6 @@ public class SpringbootJpaRelationshipApplication implements CommandLineRunner{
 				clientRepository.save(existingClient);
 
 				System.out.println("Cliente actualizado: " + existingClient);
-				existingClient.imprimeFormat();
 			});
 
 		});

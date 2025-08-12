@@ -5,12 +5,14 @@ import java.util.Set;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
@@ -25,6 +27,7 @@ public class Client {
     private String name;
     private String lastname;
 
+    // @JoinColumn(name = "client_id")
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     //@JoinColumn(name = "client_id") // Coloca la clave foránea en la tabla Address
     @JoinTable(name = "tbl_clientes_to_direcciones", 
@@ -35,6 +38,11 @@ public class Client {
 
     @OneToMany( cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "client") // mappedBy indica que la relación está mapeada por el campo 'client' en la entidad Invoice
     private Set<Invoice> invoices;
+
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="id_cliente_detalle")
+    private ClientDetails clientDetails;
 
     public Client() {
         addresses = new HashSet<>();
@@ -87,67 +95,34 @@ public class Client {
         this.invoices = invoices;
     }
 
-    @Override
-    public String toString() {
-        return "{id=" + id + 
-                ", name=" + name + 
-                ", lastname=" + lastname + 
-                ", addresses=" + addresses + 
-                ", invoices=" + invoices +
-                "}";
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((id == null) ? 0 : id.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        Client other = (Client) obj;
-        if (id == null) {
-            if (other.id != null)
-                return false;
-        } else if (!id.equals(other.id))
-            return false;
-        return true;
+    public Client addInvoice(Invoice invoice) {
+        invoices.add(invoice);
+        invoice.setClient(this);
+        return this;
     }
 
     public void removeInvoice(Invoice invoice) {
         this.getInvoices().remove(invoice);
-        invoice.setClient(null);;
+        invoice.setClient(null);
     }
 
-    public void imprimeFormat() {
-        System.out.println("");
-        System.out.println("========================================");
-        System.out.println("Datos del Cliente");
-        System.out.println("-----------------");
-        System.out.println("Id: " + this.id);
-        System.out.println("Cliente: " + this.name + " " + this.lastname);
-        System.out.println("");
-        System.out.println("Direcciones ");
-        System.out.println("-----------");
-        
-        if (addresses.isEmpty()) {
-            System.out.println("    No hay direcciones asociadas.");
-        } else {
-            addresses.forEach(address -> {
-                System.out.println("    Id: " + address.getId() + " - " + address.getStreet() + " " + address.getNumber());
-            });
-        }
+    public ClientDetails getClientDetails() {
+        return clientDetails;
+    }
 
-        System.out.println("========================================");
-        System.out.println("");
+    public void setClientDetails(ClientDetails clientDetails) {
+        this.clientDetails = clientDetails;
+    }
+
+    @Override
+    public String toString() {
+        return "{id=" + id +
+                ", name=" + name +
+                ", lastname=" + lastname +
+                ", invoices=" + invoices +
+                ", addresses=" + addresses +
+                ", clientDetails=" + clientDetails +
+                 "}";
     }
 
 }

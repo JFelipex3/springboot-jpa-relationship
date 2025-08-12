@@ -18,9 +18,6 @@ public class ClientDetails {
     private boolean premium;
     private Integer points;
 
-    @OneToOne
-    private Client client;
-    
     public ClientDetails() {
     }
 
@@ -53,20 +50,11 @@ public class ClientDetails {
         this.points = points;
     }
 
-    public Client getClient() {
-        return client;
-    }
-
-    public void setClient(Client client) {
-        this.client = client;
-    }
-
     @Override
     public String toString() {
-        return "{id=" + id + 
-               ", premium=" + premium + 
-               ", points=" + points + 
-               "}";
+        return "{id=" + id +
+                ", premium=" + premium +
+                ", points=" + points + "}";
     }
 
 }
