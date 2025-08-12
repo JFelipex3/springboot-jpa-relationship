@@ -15,7 +15,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.jmachuca.curso.springboot.jpa.springboot_jpa_relationship.entities.Address;
 import com.jmachuca.curso.springboot.jpa.springboot_jpa_relationship.entities.Client;
+import com.jmachuca.curso.springboot.jpa.springboot_jpa_relationship.entities.ClientDetails;
 import com.jmachuca.curso.springboot.jpa.springboot_jpa_relationship.entities.Invoice;
+import com.jmachuca.curso.springboot.jpa.springboot_jpa_relationship.repositories.ClientDetailsRepository;
 import com.jmachuca.curso.springboot.jpa.springboot_jpa_relationship.repositories.ClientRepository;
 import com.jmachuca.curso.springboot.jpa.springboot_jpa_relationship.repositories.InvoiceRepository;
 
@@ -28,6 +30,9 @@ public class SpringbootJpaRelationshipApplication implements CommandLineRunner{
 	@Autowired
 	private InvoiceRepository invoiceRepository;
 
+	@Autowired
+	private ClientDetailsRepository clientDetailsRepository;
+
 	public static void main(String[] args) {
 		Dotenv dotenv = Dotenv.load();
 		System.setProperty("DB_NAME", dotenv.get("DB_NAME"));
@@ -38,7 +43,21 @@ public class SpringbootJpaRelationshipApplication implements CommandLineRunner{
 
 	@Override
 	public void run(String... args) throws Exception {
-		removeInvoiceBidireccionalFindById();
+		oneToOne();
+	}
+
+	@Transactional
+	public void oneToOne() {
+
+		Client client = new Client("Erba", "Pura");
+		clientRepository.save(client);
+
+		ClientDetails clientDetails = new ClientDetails(true, 5000);
+		clientDetails.setClient(client);
+		clientDetailsRepository.save(clientDetails);
+
+		System.out.println("Cliente guardado: " + client);
+		System.out.println("Detalles del cliente guardados: " + clientDetails);
 	}
 
 	@Transactional
