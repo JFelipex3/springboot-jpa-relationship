@@ -27,7 +27,6 @@ public class Client {
     private String name;
     private String lastname;
 
-    // @JoinColumn(name = "client_id")
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     //@JoinColumn(name = "client_id") // Coloca la clave foránea en la tabla Address
     @JoinTable(name = "tbl_clientes_to_direcciones", 
@@ -40,8 +39,7 @@ public class Client {
     private Set<Invoice> invoices;
 
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="id_cliente_detalle")
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "client")
     private ClientDetails clientDetails;
 
     public Client() {
@@ -112,6 +110,12 @@ public class Client {
 
     public void setClientDetails(ClientDetails clientDetails) {
         this.clientDetails = clientDetails;
+        clientDetails.setClient(this);
+    }
+
+    public void removeClientDetails(ClientDetails clientDetails) {
+        clientDetails.setClient(null);
+        this.clientDetails = null;
     }
 
     @Override
