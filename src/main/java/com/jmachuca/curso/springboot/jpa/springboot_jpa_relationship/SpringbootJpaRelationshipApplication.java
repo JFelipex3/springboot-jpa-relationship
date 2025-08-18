@@ -53,7 +53,47 @@ public class SpringbootJpaRelationshipApplication implements CommandLineRunner{
 
 	@Override
 	public void run(String... args) throws Exception {
-		manyToManyBidireccionalFind();
+		manyToManyRemoveFindBidireccional();
+	}
+
+	public void manyToManyRemoveFindBidireccional() {
+
+		Optional<Student> studentOptional1 = studentRepository.findOneWithCourses(1L);
+		Optional<Student> studentOptional2 = studentRepository.findOneWithCourses(2L);
+
+		Student student1 = studentOptional1.get();
+		Student student2 = studentOptional2.get();
+
+		Course course1 = courseRepository.findOneWithStudents(1L).orElse(new Course("Java Master", "Andrés"));
+		Course course2 = courseRepository.findOneWithStudents(2L).orElse(new Course("Spring Boot", "Andrés"));
+
+		student1.addCourse(course1);
+		student1.addCourse(course2);
+		student2.addCourse(course2);
+
+		studentRepository.saveAll(Set.of(student1, student2));
+
+		System.out.println("Estudiantes guardados: ");
+		System.out.println(student1);
+		System.out.println(student2);
+
+		Optional<Student> studentOptionalDb = studentRepository.findOneWithCourses(1L);
+
+		if(studentOptionalDb.isPresent()) {
+			Student studentDb = studentOptionalDb.get();
+			
+			Optional<Course> courseOptionalDb = courseRepository.findOneWithStudents(1L);
+
+			if (courseOptionalDb.isPresent()) {
+				Course courseDb = courseOptionalDb.get();
+
+				studentDb.removeCourse(courseDb);
+
+				studentRepository.save(studentDb);
+
+				System.out.println("Estudiante actualizado: " + studentDb);
+			}
+		}
 	}
 
 	public void manyToManyBidireccionalFind() {
