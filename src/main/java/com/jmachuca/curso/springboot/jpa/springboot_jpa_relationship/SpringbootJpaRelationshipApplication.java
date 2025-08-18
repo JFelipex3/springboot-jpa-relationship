@@ -53,7 +53,53 @@ public class SpringbootJpaRelationshipApplication implements CommandLineRunner{
 
 	@Override
 	public void run(String... args) throws Exception {
-		manyToManyRemoveFind();
+		manyToManyRemoveCreate();
+	}
+
+	public void manyToManyRemoveCreate() {
+
+		/* 
+		 	Hibernate: insert into students (lastname,name) values (?,?)
+			Hibernate: insert into courses (instructor,name) values (?,?)
+			Hibernate: insert into students (lastname,name) values (?,?)
+			Hibernate: insert into courses (instructor,name) values (?,?)
+			Hibernate: insert into students_courses (student_id,courses_id) values (?,?)
+			Hibernate: insert into students_courses (student_id,courses_id) values (?,?)
+			Hibernate: insert into students_courses (student_id,courses_id) values (?,?)
+		*/
+
+		Student student1 = new Student("Jano", "Pura");
+		Student student2 = new Student("Erba", "Doe");
+
+		Course course1 = new Course("Java Master", "Andrés");
+		Course course2 = new Course("Spring Boot", "Andrés");
+
+		student1.setCourses(Set.of(course1, course2));
+		student2.setCourses(Set.of(course2));
+
+		studentRepository.saveAll(Set.of(student1, student2));
+
+		System.out.println("Estudiantes guardados: ");
+		System.out.println(student1);
+		System.out.println(student2);
+
+		Optional<Student> studentOptionalDb = studentRepository.findOneWithCourses(4L);
+
+		if(studentOptionalDb.isPresent()) {
+			Student studentDb = studentOptionalDb.get();
+			
+			Optional<Course> courseOptionalDb = courseRepository.findById(3L);
+
+			if (courseOptionalDb.isPresent()) {
+				Course courseDb = courseOptionalDb.get();
+
+				studentDb.getCourses().remove(courseDb);
+
+				studentRepository.save(studentDb);
+
+				System.out.println("Estudiante actualizado: " + studentDb);
+			}
+		}
 	}
 
 	public void manyToManyRemoveFind() {
