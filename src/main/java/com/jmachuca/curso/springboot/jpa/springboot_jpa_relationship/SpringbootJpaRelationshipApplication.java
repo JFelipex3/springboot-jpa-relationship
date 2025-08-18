@@ -16,10 +16,13 @@ import org.springframework.transaction.annotation.Transactional;
 import com.jmachuca.curso.springboot.jpa.springboot_jpa_relationship.entities.Address;
 import com.jmachuca.curso.springboot.jpa.springboot_jpa_relationship.entities.Client;
 import com.jmachuca.curso.springboot.jpa.springboot_jpa_relationship.entities.ClientDetails;
+import com.jmachuca.curso.springboot.jpa.springboot_jpa_relationship.entities.Course;
 import com.jmachuca.curso.springboot.jpa.springboot_jpa_relationship.entities.Invoice;
+import com.jmachuca.curso.springboot.jpa.springboot_jpa_relationship.entities.Student;
 import com.jmachuca.curso.springboot.jpa.springboot_jpa_relationship.repositories.ClientDetailsRepository;
 import com.jmachuca.curso.springboot.jpa.springboot_jpa_relationship.repositories.ClientRepository;
 import com.jmachuca.curso.springboot.jpa.springboot_jpa_relationship.repositories.InvoiceRepository;
+import com.jmachuca.curso.springboot.jpa.springboot_jpa_relationship.repositories.StudentRepository;
 
 @SpringBootApplication
 public class SpringbootJpaRelationshipApplication implements CommandLineRunner{
@@ -33,6 +36,9 @@ public class SpringbootJpaRelationshipApplication implements CommandLineRunner{
 	@Autowired
 	private ClientDetailsRepository clientDetailsRepository;
 
+	@Autowired
+	private StudentRepository studentRepository;
+
 	public static void main(String[] args) {
 		Dotenv dotenv = Dotenv.load();
 		System.setProperty("DB_NAME", dotenv.get("DB_NAME"));
@@ -43,11 +49,46 @@ public class SpringbootJpaRelationshipApplication implements CommandLineRunner{
 
 	@Override
 	public void run(String... args) throws Exception {
-		oneToOneBidireccionalFindById();
+		manyToManyCreate();
+	}
+
+	public void manyToManyCreate() {
+
+		/* 
+		 	Hibernate: insert into students (lastname,name) values (?,?)
+			Hibernate: insert into courses (instructor,name) values (?,?)
+			Hibernate: insert into students (lastname,name) values (?,?)
+			Hibernate: insert into courses (instructor,name) values (?,?)
+			Hibernate: insert into students_courses (student_id,courses_id) values (?,?)
+			Hibernate: insert into students_courses (student_id,courses_id) values (?,?)
+			Hibernate: insert into students_courses (student_id,courses_id) values (?,?)
+		*/
+
+		Student student1 = new Student("Jano", "Pura");
+		Student student2 = new Student("Erba", "Doe");
+
+		Course course1 = new Course("Java Master", "Andrés");
+		Course course2 = new Course("Spring Boot", "Andrés");
+
+		student1.setCourses(Set.of(course1, course2));
+		student2.setCourses(Set.of(course2));
+
+		studentRepository.saveAll(Set.of(student1, student2));
+
+		System.out.println("Estudiantes guardados: ");
+		System.out.println(student1);
+		System.out.println(student2);
 	}
 
 	@Transactional
 	public void oneToOneBidireccionalFindById() {
+
+		/* 
+			Hibernate: select c1_0.id,a1_0.id_cliente,a1_1.id,a1_1.number,a1_1.street,cd1_0.id,cd1_0.points,cd1_0.premium,i1_0.client_id,i1_0.id,i1_0.description,i1_0.total,c1_0.lastname,c1_0.name from clients c1_0 left join invoices i1_0 on c1_0.id=i1_0.client_id left join tbl_clientes_to_direcciones a1_0 on c1_0.id=a1_0.id_cliente left join addresses a1_1 on a1_1.id=a1_0.id_direcciones left join client_details cd1_0 on c1_0.id=cd1_0.id_cliente where c1_0.id=?
+			Hibernate: select c1_0.id,a1_0.id_cliente,a1_1.id,a1_1.number,a1_1.street,cd1_0.id,cd1_0.points,cd1_0.premium,c1_0.lastname,c1_0.name from clients c1_0 left join tbl_clientes_to_direcciones a1_0 on c1_0.id=a1_0.id_cliente left join addresses a1_1 on a1_1.id=a1_0.id_direcciones left join client_details cd1_0 on c1_0.id=cd1_0.id_cliente where c1_0.id=?
+			Hibernate: select i1_0.client_id,i1_0.id,i1_0.description,i1_0.total from invoices i1_0 where i1_0.client_id=?
+			Hibernate: insert into client_details (id_cliente,points,premium) values (?,?,?)
+		*/
 
 		Optional<Client> optionalClient = clientRepository.findOne(2L);
 
