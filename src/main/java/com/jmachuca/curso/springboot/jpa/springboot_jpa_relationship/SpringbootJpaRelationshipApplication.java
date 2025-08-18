@@ -21,6 +21,7 @@ import com.jmachuca.curso.springboot.jpa.springboot_jpa_relationship.entities.In
 import com.jmachuca.curso.springboot.jpa.springboot_jpa_relationship.entities.Student;
 import com.jmachuca.curso.springboot.jpa.springboot_jpa_relationship.repositories.ClientDetailsRepository;
 import com.jmachuca.curso.springboot.jpa.springboot_jpa_relationship.repositories.ClientRepository;
+import com.jmachuca.curso.springboot.jpa.springboot_jpa_relationship.repositories.CourseRepository;
 import com.jmachuca.curso.springboot.jpa.springboot_jpa_relationship.repositories.InvoiceRepository;
 import com.jmachuca.curso.springboot.jpa.springboot_jpa_relationship.repositories.StudentRepository;
 
@@ -39,6 +40,9 @@ public class SpringbootJpaRelationshipApplication implements CommandLineRunner{
 	@Autowired
 	private StudentRepository studentRepository;
 
+	@Autowired
+	private CourseRepository courseRepository;
+
 	public static void main(String[] args) {
 		Dotenv dotenv = Dotenv.load();
 		System.setProperty("DB_NAME", dotenv.get("DB_NAME"));
@@ -49,7 +53,42 @@ public class SpringbootJpaRelationshipApplication implements CommandLineRunner{
 
 	@Override
 	public void run(String... args) throws Exception {
-		manyToManyCreate();
+		manyToManyFind();
+	}
+
+	public void manyToManyFind() {
+
+		/* 
+		 	Hibernate: select s1_0.id,s1_0.lastname,s1_0.name from students s1_0 where s1_0.id=?
+			Hibernate: select s1_0.id,s1_0.lastname,s1_0.name from students s1_0 where s1_0.id=?
+			Hibernate: select c1_0.id,c1_0.instructor,c1_0.name from courses c1_0 where c1_0.id=?
+			Hibernate: select c1_0.id,c1_0.instructor,c1_0.name from courses c1_0 where c1_0.id=?
+			Hibernate: select s1_0.id,c1_0.alumno_id,c1_1.id,c1_1.instructor,c1_1.name,s1_0.lastname,s1_0.name from students s1_0 left join tbl_alumnos_cursos c1_0 on s1_0.id=c1_0.alumno_id left join courses c1_1 on c1_1.id=c1_0.curso_id where s1_0.id=?
+			Hibernate: select c1_0.id,c1_0.instructor,c1_0.name from courses c1_0 where c1_0.id=?
+			Hibernate: select c1_0.id,c1_0.instructor,c1_0.name from courses c1_0 where c1_0.id=?
+			Hibernate: select s1_0.id,c1_0.alumno_id,c1_1.id,c1_1.instructor,c1_1.name,s1_0.lastname,s1_0.name from students s1_0 left join tbl_alumnos_cursos c1_0 on s1_0.id=c1_0.alumno_id left join courses c1_1 on c1_1.id=c1_0.curso_id where s1_0.id=?
+			Hibernate: insert into tbl_alumnos_cursos (alumno_id,curso_id) values (?,?)
+			Hibernate: insert into tbl_alumnos_cursos (alumno_id,curso_id) values (?,?)
+			Hibernate: insert into tbl_alumnos_cursos (alumno_id,curso_id) values (?,?)
+		*/
+
+		Optional<Student> studentOptional1 = studentRepository.findById(1L);
+		Optional<Student> studentOptional2 = studentRepository.findById(2L);
+
+		Student student1 = studentOptional1.get();
+		Student student2 = studentOptional2.get();
+
+		Course course1 = courseRepository.findById(1L).orElse(new Course("Java Master", "Andrés"));
+		Course course2 = courseRepository.findById(2L).orElse(new Course("Spring Boot", "Andrés"));
+
+		student1.setCourses(Set.of(course1, course2));
+		student2.setCourses(Set.of(course2));
+
+		studentRepository.saveAll(Set.of(student1, student2));
+
+		System.out.println("Estudiantes guardados: ");
+		System.out.println(student1);
+		System.out.println(student2);
 	}
 
 	public void manyToManyCreate() {
