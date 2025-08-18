@@ -56,6 +56,25 @@ public class SpringbootJpaRelationshipApplication implements CommandLineRunner{
 		manyToManyRemoveCreate();
 	}
 
+	public void manyToManyCreateBidirectional() {
+
+		Student student1 = new Student("Jano", "Pura");
+		Student student2 = new Student("Erba", "Doe");
+
+		Course course1 = new Course("Java Master", "Andrés");
+		Course course2 = new Course("Spring Boot", "Andrés");
+
+		student1.addCourse(course1);
+		student1.addCourse(course2);
+		student2.addCourse(course2);
+
+		studentRepository.saveAll(Set.of(student1, student2));
+
+		System.out.println("Estudiantes guardados: ");
+		System.out.println(student1);
+		System.out.println(student2);
+	}
+
 	public void manyToManyRemoveCreate() {
 
 		/* 

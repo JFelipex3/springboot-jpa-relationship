@@ -72,6 +72,53 @@ public class Student {
         this.courses = courses;
     }
 
+    public void addCourse(Course course) {
+        this.courses.add(course);
+        course.getStudents().add(this); // Para mantener la relación bidireccional
+    }
+
+    public void removeCourse(Course course) {
+        this.courses.remove(course);
+        course.getStudents().remove(this); // Para mantener la relación bidireccional
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((id == null) ? 0 : id.hashCode());
+        result = prime * result + ((name == null) ? 0 : name.hashCode());
+        result = prime * result + ((lastname == null) ? 0 : lastname.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Student other = (Student) obj;
+        if (id == null) {
+            if (other.id != null)
+                return false;
+        } else if (!id.equals(other.id))
+            return false;
+        if (name == null) {
+            if (other.name != null)
+                return false;
+        } else if (!name.equals(other.name))
+            return false;
+        if (lastname == null) {
+            if (other.lastname != null)
+                return false;
+        } else if (!lastname.equals(other.lastname))
+            return false;
+        return true;
+    }
+
     @Override
     public String toString() {
         return "{id=" + id + ", name=" + name + ", lastname=" + lastname + ", courses=" + courses + "}";
